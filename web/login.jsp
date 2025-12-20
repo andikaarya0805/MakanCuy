@@ -1,0 +1,64 @@
+<%-- 
+    Document   : login
+    Created on : Dec 20, 2025, 1:29:11 PM
+    Author     : andik
+--%>
+<% 
+    String error = request.getParameter("error");
+    if ("need_login".equals(error)) {
+%>
+    <div style="background: #ffcccc; color: #990000; padding: 10px; margin-bottom: 10px; border-radius: 5px; text-align: center;">
+        ⚠️ Eits! Login dulu ler kalau mau pesan.
+    </div>
+<% } %>
+
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Admin - MakanCuy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0d0d0d; --card: #1a1a1a; --accent: #ccff00; --text: #fff; --font: 'Space Grotesk', sans-serif; }
+        body { background: var(--bg); color: var(--text); font-family: var(--font); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        
+        .login-card {
+            background: var(--card); padding: 40px; border-radius: 24px; width: 100%; max-width: 400px;
+            border: 1px solid #333; text-align: center;
+        }
+        
+        h1 { margin-bottom: 10px; }
+        input { width: 100%; padding: 15px; margin: 10px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 12px; box-sizing: border-box; font-family: var(--font); }
+        input:focus { outline: none; border-color: var(--accent); }
+        
+        .btn {
+            width: 100%; padding: 15px; background: var(--accent); color: #000; border: none;
+            border-radius: 50px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 20px; transition: 0.3s;
+        }
+        .btn:hover { box-shadow: 0 0 15px rgba(204, 255, 0, 0.3); }
+        .error { color: #ff4757; font-size: 0.9rem; margin-top: 10px; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h1>🤲️ batas suci </h1>
+        <p style="color: #aaa; margin-bottom: 30px;">Login dulu, Boss.</p>
+        
+        <% if ("true".equals(request.getParameter("error"))) { %>
+            <p style="color: #ff4757; margin-bottom: 15px;">Username / Password salah!</p>
+        <% } %>
+
+        <form action="auth" method="post">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit" class="btn">GAS MASUK ➜</button>
+        </form>
+        
+        <br>
+        <a href="./" style="color: #aaa; text-decoration: none; font-size: 0.8rem;">← Balik ke Menu Utama</a>
+    </div>
+
+</body>
+</html>
