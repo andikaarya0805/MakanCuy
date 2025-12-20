@@ -1,155 +1,240 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ page import="com.makancuy.model.User" %>
+
+<%
+    User user = (User) session.getAttribute("user");
+    if (user == null || !"admin".equals(user.getRole())) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
 
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard - MakanCuy</title>
+    <title>Admin Dashboard Pro - MakanCuy</title>
+    <script src="https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+    <script src="https://unpkg.com/chart.js@4.4.0/dist/chart.umd.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* BASE STYLE */
-        :root { --bg: #0d0d0d; --card: #1a1a1a; --accent: #ccff00; --text: #fff; --font: 'Space Grotesk', sans-serif; }
-        body { background: var(--bg); color: var(--text); font-family: var(--font); padding: 20px; }
-        .container { max-width: 1000px; margin: 0 auto; }
-
-        /* DASHBOARD HEADER */
-        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 20px; }
-        
-        /* STATS CARD */
-        .stats-card { background: var(--card); padding: 25px; border: 1px solid var(--accent); border-radius: 15px; display: inline-block; min-width: 250px; }
-        .stats-num { font-size: 2.5rem; font-weight: bold; color: var(--accent); margin: 10px 0; }
-        
-        /* TABLE */
-        .table-container { overflow-x: auto; margin-top: 20px; }
+        :root { --bg: #0d0d0d; --sidebar: #111; --card: #1a1a1a; --accent: #ccff00; --text: #fff; --hover: #222; }
+        * { box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: 'Space Grotesk', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 260px; background: var(--sidebar); border-right: 1px solid #333; display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; }
+        .brand { font-size: 1.5rem; font-weight: bold; color: var(--accent); margin-bottom: 40px; text-transform: uppercase; letter-spacing: 2px; }
+        .nav-link { display: flex; align-items: center; padding: 15px; color: #888; text-decoration: none; margin-bottom: 5px; border-radius: 10px; transition: 0.3s; cursor: pointer; }
+        .nav-link:hover { background: var(--hover); color: #fff; }
+        .nav-link.active { background: var(--accent); color: #000; font-weight: bold; }
+        .nav-icon { margin-right: 15px; font-size: 1.2rem; }
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+        .tab-section { display: none; animation: fadeIn 0.4s; }
+        .tab-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .card { background: var(--card); padding: 25px; border: 1px solid #333; border-radius: 15px; margin-bottom: 20px; }
+        .card-highlight { border-color: var(--accent); }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; }
-        th { color: var(--accent); text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
-        tr:hover { background: #222; }
-        
-        /* BUTTONS */
-        .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; text-decoration: none; color: #000; display: inline-block; }
-        .btn:hover { opacity: 0.8; }
-        .btn-add { background: var(--accent); width: 100%; margin-top: 10px; }
-        .btn-del { background: #ff4757; color: #fff; padding: 6px 12px; font-size: 0.8rem; border-radius: 4px; }
-        .btn-print { background: #fff; color: #000; }
-        .btn-home { background: transparent; color: #fff; border: 1px solid #fff; margin-right: 10px;}
-
-        /* FORM */
-        .add-form { background: var(--card); padding: 30px; border-radius: 15px; margin-top: 50px; border: 1px dashed #555; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; color: #aaa; font-size: 0.9rem; }
-        input, select, textarea { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; font-family: var(--font); }
-        
-        /* PRINT MODE */
-        @media print {
-            body { background: #fff; color: #000; }
-            .no-print, .add-form, .btn-del, .btn-print, .btn-home { display: none !important; }
-            .stats-card { border: 2px solid #000; color: #000; background: none; }
-            .stats-num { color: #000; }
-            table { border: 1px solid #000; width: 100%; }
-            th, td { border-bottom: 1px solid #000; color: #000; }
-        }
+        th { color: var(--accent); text-transform: uppercase; font-size: 0.8rem; }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; text-decoration: none; font-size: 0.9rem; }
+        .btn-primary { background: var(--accent); color: #000; width: 100%; margin-top: 10px; }
+        .custom-select { background: #000; color: #fff; border: 1px solid var(--accent); padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        input, select, textarea { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; margin-bottom: 15px; border-radius: 8px; font-family: inherit; }
+        .chart-container { position: relative; height: 300px; width: 100%; }
+        .user-info { margin-top: auto; padding-top: 20px; border-top: 1px solid #333; font-size: 0.9rem; color: #555; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="dashboard-header">
-            <div>
-                <h1>Admin Dashboard ⚙️</h1>
-                <p style="color: var(--accent)">Halo, ${currentUser}!</p> 
+    <nav class="sidebar">
+        <div class="brand">MAKANCUY.</div>
+        <a onclick="switchTab('dashboard')" class="nav-link active" id="link-dashboard"><span class="nav-icon">📊</span> Dashboard</a>
+        <a onclick="switchTab('history')" class="nav-link" id="link-history"><span class="nav-icon">📜</span> Riwayat Transaksi</a>
+        <a onclick="switchTab('menu')" class="nav-link" id="link-menu"><span class="nav-icon">🍔</span> Manajemen Menu</a>
+
+        <div class="user-info">
+            Login as: <b style="color: #fff;"><%= user.getUsername() %></b><br><br>
+            <a href="./" style="color: #888; text-decoration: none;">➜ Web Utama</a><br>
+            <a href="auth" style="color: #ff4757; text-decoration: none;">✖ Logout</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        
+        <div id="tab-dashboard" class="tab-section active">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2>Overview Penjualan</h2>
+                <select id="global-filter" class="custom-select" onchange="fetchData()">
+                    <option value="all">Semua Waktu</option>
+                    <option value="today">Hari Ini</option>
+                    <option value="week">Minggu Ini</option>
+                    <option value="month">Bulan Ini</option>
+                </select>
             </div>
-            <div class="no-print">
-                <a href="./" class="btn btn-home">Web Utama</a>
-                <a href="auth" class="btn" style="background: #333; color: #fff; font-size: 0.9rem; margin-right: 10px;">Logout ➜</a>
-                <button onclick="window.print()" class="btn btn-print">🖨️ Cetak</button>
+            <div class="card card-highlight">
+                <small style="color: #888;">TOTAL PENDAPATAN</small>
+                <h1 id="total-revenue-text" style="color: var(--accent); font-size: 3.5rem; margin: 10px 0;">Rp 0</h1>
+            </div>
+            <div class="card">
+                <div class="chart-container"><canvas id="salesChart"></canvas></div>
             </div>
         </div>
 
-        <div class="card">
-    <h3>TOTAL PENDAPATAN (SALES)</h3>
-    <h1 style="color: var(--accent-green); font-size: 3rem; margin: 10px 0;">
-        <fmt:setLocale value="id_ID"/>
-        <fmt:formatNumber value="${totalSales}" type="currency" currencySymbol="Rp " maxFractionDigits="0"/>
-    </h1>
-    <p>Updated: Realtime</p>
-</div>
-        <h2 style="margin-top: 40px; border-left: 5px solid var(--accent); padding-left: 15px;">Laporan Stok Menu</h2>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Menu</th>
-                        <th>Harga</th>
-                        <th>Kategori</th>
-                        <th class="no-print">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:forEach items="${adminMenu}" var="m">
-                        <tr>
-                            <td>#${m.id}</td>
-                            <td>
-                                <strong>${m.name}</strong><br>
-                                <small style="color: #aaa">${m.description}</small>
-                            </td>
-                            <td>Rp <fmt:formatNumber value="${m.price}" maxFractionDigits="0"/></td>
-                            <td>${m.category}</td>
-                            <td class="no-print">
-                                <a href="admin?action=delete&id=${m.id}" class="btn btn-del" onclick="return confirm('Hapus menu ini?')">Hapus</a>
-                            </td>
-                        </tr>
-                    </c:forEach>
-                    
-                    <c:if test="${empty adminMenu}">
-                        <tr>
-                            <td colspan="5" style="text-align: center; padding: 30px;">Belum ada menu nih. Tambah di bawah ya! 👇</td>
-                        </tr>
-                    </c:if>
-                </tbody>
-            </table>
-        </div>
+        <div id="tab-history" class="tab-section">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                <h2>Laporan Transaksi</h2>
+                <button onclick="downloadReport()" class="btn" style="background: #fff;">📄 Download PDF</button>
+            </div>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Tanggal</th><th>Pelanggan</th><th>Metode</th><th>Total</th></tr>
+                    </thead>
+                    <tbody id="table-history-body"></tbody>
+                </table>
+            </div>
         </div>
 
-        <div class="add-form no-print">
-            <h3 style="margin-bottom: 20px;">➕ Input Menu Baru</h3>
-            <form action="admin" method="post">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Nama Makanan</label>
-                        <input type="text" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Harga (Angka)</label>
-                        <input type="number" name="price" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Kategori</label>
+        <div id="tab-menu" class="tab-section">
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                <div class="card">
+                    <h3>Daftar Stok Menu</h3>
+                    <table>
+                        <thead>
+                            <tr><th>Menu</th><th>Harga</th><th>Aksi</th></tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach items="${adminMenu}" var="m">
+                                <tr>
+                                    <td><b>${m.name}</b><br><small style="color:#888">${m.category}</small></td>
+                                    <td>Rp <fmt:formatNumber value="${m.price}" maxFractionDigits="0"/></td>
+                                    <td><a href="admin?action=delete&id=${m.id}" onclick="return confirm('Hapus menu ini?')" style="color: #ff4757; text-decoration:none;">Hapus</a></td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>➕ Tambah Menu</h3>
+                    <form action="admin" method="post">
+                        <input type="text" name="name" required placeholder="Nama Menu">
+                        <input type="number" name="price" required placeholder="Harga">
                         <select name="category">
                             <option value="Makanan">Makanan</option>
                             <option value="Minuman">Minuman</option>
                             <option value="Cemilan">Cemilan</option>
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <label>URL Gambar</label>
-                        <input type="text" name="image" placeholder="https://..." required>
-                    </div>
+                        <input type="text" name="image" placeholder="URL Gambar" required>
+                        <textarea name="description" placeholder="Deskripsi Singkat"></textarea>
+                        <button type="submit" class="btn btn-primary">SIMPAN MENU</button>
+                    </form>
                 </div>
-                <div class="form-group">
-                    <label>Deskripsi</label>
-                    <textarea name="description" rows="2"></textarea>
-                </div>
-                <button type="submit" class="btn btn-add">SIMPAN KE DATABASE</button>
-            </form>
+            </div>
         </div>
+    </main>
 
-        <br><br><br>
-    </div>
+    <script>
+        let salesChart;
 
+        async function fetchData() {
+            const filterElement = document.getElementById('global-filter');
+            const tbody = document.getElementById('table-history-body');
+            const revenueText = document.getElementById('total-revenue-text');
+            
+            if (!filterElement || !tbody) return; // Safety check
+
+            const filter = filterElement.value;
+            const url = '<%= request.getContextPath() %>/api/admin-stats?filter=' + filter;
+            
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+
+                // 1. Update Revenue
+                revenueText.innerText = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(data.totalRevenue);
+
+                // 2. Update Table
+                tbody.innerHTML = '';
+                const labels = [];
+                const values = [];
+
+                data.history.forEach(item => {
+                    tbody.innerHTML += '<tr>' +
+                        '<td>#' + item.id + '</td>' +
+                        '<td>' + item.date + '</td>' +
+                        '<td>' + item.username + '</td>' +
+                        '<td><span style="border:1px solid #333; padding:2px 6px; border-radius:4px">' + item.method + '</span></td>' +
+                        '<td>Rp ' + item.total.toLocaleString('id-ID') + '</td>' +
+                    '</tr>';
+                    labels.unshift(item.date);
+                    values.unshift(item.total);
+                });
+
+                // 3. Update Chart
+                if (salesChart) {
+                    salesChart.data.labels = labels;
+                    salesChart.data.datasets[0].data = values;
+                    salesChart.update();
+                }
+            } catch (err) { console.error("Fetch Error:", err); }
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('salesChart');
+            if (!ctx) return;
+            salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Pendapatan (Rp)',
+                        data: [],
+                        borderColor: '#ccff00',
+                        backgroundColor: 'rgba(204, 255, 0, 0.1)',
+                        fill: true, tension: 0.3
+                    }]
+                },
+                options: { 
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, grid: { color: '#222' } }, x: { grid: { color: '#222' } } }
+                }
+            });
+        }
+
+        function switchTab(name) {
+            const tabs = ['dashboard', 'history', 'menu'];
+            tabs.forEach(tab => {
+                const section = document.getElementById('tab-' + tab);
+                const link = document.getElementById('link-' + tab);
+                if (section && link) {
+                    if (tab === name) {
+                        section.classList.add('active');
+                        link.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                        link.classList.remove('active');
+                    }
+                }
+            });
+            localStorage.setItem('activeTab', name);
+        }
+
+        function downloadReport() {
+            const opt = { margin: 1, filename: 'Laporan_MakanCuy.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+            const element = document.getElementById('tab-history');
+            html2pdf().set(opt).from(element).save();
+        }
+
+        window.onload = () => {
+            initChart();
+            fetchData();
+            setInterval(fetchData, 1000); // Polling data tiap 5 detik
+            const lastTab = localStorage.getItem('activeTab') || 'dashboard';
+            switchTab(lastTab);
+        };
+    </script>
 </body>
 </html>

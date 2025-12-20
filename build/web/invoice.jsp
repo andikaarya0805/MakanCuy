@@ -7,18 +7,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Invoice #${orderId}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">
     <style>
-        /* Desain ala Kertas Struk Belanja */
         body { background: #222; display: flex; justify-content: center; padding: 50px; font-family: 'Space Mono', monospace; }
         
         .receipt {
             background: #fff; width: 350px; padding: 20px; color: #000;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            position: relative; /* Wajib relative biar tombol close bisa diatur posisinya */
+            box-shadow: 0 0 20px rgba(0,0,0,0.5); position: relative;
         }
         
-        /* Efek Gerigi Kertas Atas Bawah */
+        /* CSS Gerigi Kertas (Biar tetep estetik di PDF) */
         .receipt::before {
             content: ""; position: absolute; top: -10px; left: 0; width: 100%; height: 10px;
             background: linear-gradient(135deg, #fff 5px, transparent 0) 0 5px,
@@ -38,43 +38,25 @@
         .total-section { border-top: 2px dashed #000; margin-top: 15px; padding-top: 10px; font-weight: bold; font-size: 1.1rem; display: flex; justify-content: space-between; }
         .footer { text-align: center; margin-top: 20px; font-size: 0.7rem; color: #555; }
         
-        /* STYLE TOMBOL CLOSE (X) */
-        .close-btn {
-            position: absolute; top: 15px; right: 20px;
-            text-decoration: none; color: #000; font-size: 1.5rem; font-weight: bold;
-            line-height: 1; transition: 0.2s;
-        }
-        .close-btn:hover { color: red; transform: scale(1.2); }
-
-        /* TOMBOL CETAK */
-        .btn-print { 
-            display: block; width: 100%; padding: 12px; background: #000; color: #fff; 
-            text-align: center; text-decoration: none; margin-top: 20px; cursor: pointer; 
-            border: none; font-family: inherit; font-weight: bold; font-size: 0.9rem;
-            transition: 0.2s;
-        }
-        .btn-print:hover { background: #333; }
+        .close-btn { position: absolute; top: 15px; right: 20px; text-decoration: none; color: #000; font-size: 1.5rem; font-weight: bold; line-height: 1; }
+        .btn-print { display: block; width: 100%; padding: 12px; background: #ccff00; color: #000; text-align: center; border: none; font-weight: bold; font-size: 0.9rem; cursor: pointer; margin-top: 20px; }
         
-        /* --- MAGIC BUAT NGILANGIN TOMBOL PAS PRINT --- */
-        @media print { 
-            body { background: #fff; padding: 0; } 
-            .receipt { box-shadow: none; width: 100%; } /* Biar full width kertas */
-            
-            /* Sembunyikan semua elemen dengan class 'no-print' */
-            .no-print { display: none !important; } 
-        }
+        /* Kelas buat ngumpetin elemen pas digenerate PDF */
+        .hide-on-pdf { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div class="receipt">
-        <a href="./" class="close-btn no-print" title="Tutup">&times;</a>
+    <div class="receipt" id="area-cetak">
+        
+        <a href="./" class="close-btn" data-html2canvas-ignore="true">&times;</a>
 
         <h2>MAKANCUY.</h2>
-        <div style="text-align: center; font-size: 0.8rem;">Cabang Server Lokal :43602</div>
+        <div style="text-align: center; font-size: 0.8rem;">Cabang : Jomokerto  </div>
         
         <div class="meta">
             <div>Order ID: #${orderId}</div>
+            <div style="text-transform: uppercase; font-weight: bold;">Pelanggan: ${sessionScope.user.username}</div>
             <div>Tgl: ${orderDate}</div>
             <div>Bayar: ${paymentMethod}</div>
         </div>
@@ -101,8 +83,29 @@
             <p>--- LUNAS (${paymentMethod}) ---</p>
         </div>
 
-        <button onclick="window.print()" class="btn-print no-print">🖨️ CETAK NOTA</button>
+        <button onclick="downloadPDF()" class="btn-print" data-html2canvas-ignore="true">
+            ⬇️ CETAK STRUK
+        </button>
     </div>
+
+    <script>
+        function downloadPDF() {
+            // Ambil elemen struk
+            var element = document.getElementById('area-cetak');
+            
+            // Settingan PDF
+            var opt = {
+                margin:       [0, 0, 0, 0], // Margin atas, kiri, bawah, kanan
+                filename:     'Invoice_MakanCuy_#${orderId}.pdf', // Nama file otomatis
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 }, // Resolusi biar tajam
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            // Generate dan Save
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
 
 </body>
 </html>
