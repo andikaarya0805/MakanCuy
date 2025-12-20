@@ -3,7 +3,7 @@ package com.makancuy.controller;
 import com.makancuy.dao.CartDAO;
 import com.makancuy.model.CartItem;
 import com.makancuy.model.User;
-import util.DBConnection;
+import util.DBConnection; // Perbaikan Import
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -42,15 +42,15 @@ public class Orders extends HttpServlet {
 
         try (Connection conn = DBConnection.getConnection()) {
             
-            // 1. Simpan Header Order (TAMBAH payment_method)
+            // 1. Simpan Header Order
             String sqlOrder = "INSERT INTO orders (user_id, total_price, status, payment_method) VALUES (?, ?, 'PAID', ?)";
             PreparedStatement psOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
             psOrder.setInt(1, user.getId());
             psOrder.setDouble(2, total);
-            psOrder.setString(3, paymentMethod); // Simpan Pilihan User
+            psOrder.setString(3, paymentMethod);
             psOrder.executeUpdate();
             
-            // Ambil ID Order
+            // Ambil ID Order (PENTING BUAT INVOICE)
             ResultSet rsKey = psOrder.getGeneratedKeys();
             int orderId = 0;
             if (rsKey.next()) orderId = rsKey.getInt(1);
@@ -71,12 +71,13 @@ public class Orders extends HttpServlet {
             // 3. Kosongkan Keranjang
             cartDAO.clearCart(user.getId());
 
-            // --- PERBAIKAN REDIRECT DI SINI ---
-            // Jangan ke "index.jsp", tapi ke "./" (Root) supaya HomeServlet jalan & menu muncul
-            resp.sendRedirect("./?status=order_success&method=" + paymentMethod);
+            // --- SUKSES! REDIRECT KE INVOICE ---
+            // Kirim ID Order ke InvoiceServlet biar bisa dicetak
+            resp.sendRedirect("invoice?id=" + orderId);
 
         } catch (Exception e) {
             e.printStackTrace();
+            // Kalau error, balik ke home kasih tau gagal
             resp.sendRedirect("./?status=order_failed");
         }
     }

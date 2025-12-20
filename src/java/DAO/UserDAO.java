@@ -30,6 +30,23 @@ public class UserDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return user; // Kalau gagal login, ini isinya null
+        return user; // Kalau gagal login, ini isinya null  
+    }
+    
+    // --- FITUR REGISTER ---
+    public void registerUser(String username, String password) {
+        // Default role pas daftar adalah 'user' (bukan admin)
+        String sql = "INSERT INTO users (username, password, role) VALUES (?, ?, 'user')";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ps.executeUpdate();
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
