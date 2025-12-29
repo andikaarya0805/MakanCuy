@@ -36,128 +36,97 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     
     <style>
-      /* --- GEN Z THEME VARIABLES --- */
-    :root {
-        --bg-color: #0d0d0d;
-        --card-bg: #1a1a1a;
-        --text-main: #ffffff;
-        --text-sec: #a1a1a1;
-        --accent-green: #ccff00; /* Acid Green */
-        --font-main: 'Space Grotesk', sans-serif;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-        background-color: var(--bg-color);
-        color: var(--text-main);
-        font-family: var(--font-main);
-        overflow-x: hidden;
-    }
-
-    /* UTILS */
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-    
-    .btn { padding: 12px 32px; border-radius: 50px; font-weight: 700; cursor: pointer; border: none; transition: 0.3s; text-decoration: none; display: inline-block; }
-    .btn-primary { background-color: var(--accent-green); color: #000; }
-    .btn-primary:hover { transform: scale(1.05) rotate(-2deg); box-shadow: 0 0 20px rgba(204, 255, 0, 0.4); }
-
-    /* NAVBAR DEFAULT (LAPTOP) */
-    nav { display: flex; justify-content: space-between; align-items: center; padding: 30px 0; }
-    .logo { font-size: 1.8rem; font-weight: 700; letter-spacing: -1px; }
-    .logo span { color: var(--accent-green); }
-
-    /* HERO SECTION */
-    .hero { 
-        display: flex; align-items: center; justify-content: space-between; 
-        min-height: 60vh; margin-bottom: 50px; flex-wrap: wrap; 
-    }
-    .hero h1 { font-size: 4rem; line-height: 1; margin-bottom: 20px; letter-spacing: -2px; }
-    .hero h1 span { -webkit-text-stroke: 1px var(--accent-green); color: transparent; }
-    .hero-img img { 
-        width: 350px; height: 350px; object-fit: cover; border-radius: 50%; 
-        border: 2px solid var(--accent-green); animation: float 6s ease-in-out infinite; 
-    }
-
-    /* --- MOBILE RESPONSIVE FIX (MEDIA QUERY) --- */
-    @media (max-width: 768px) {
-        /* 1. Navbar Jadi Tumpuk ke Bawah */
-        nav {
-            flex-direction: column;
-            gap: 20px;
-            text-align: center;
-        }
-        
-        /* 2. Hero Adaptive (Gambar di Atas) */
-        .hero {
-            flex-direction: column-reverse; /* Gambar naik ke atas */
-            text-align: center;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 20px;
+        /* --- GEN Z THEME VARIABLES --- */
+        :root {
+            --bg-color: #0d0d0d;
+            --card-bg: #1a1a1a;
+            --text-main: #ffffff;
+            --text-sec: #a1a1a1;
+            --accent-green: #ccff00; /* Acid Green */
+            --font-main: 'Space Grotesk', sans-serif;
         }
 
-        .hero h1 { font-size: 2.5rem; } /* Font judul dikecilin */
-        .hero p { padding: 0 10px; font-size: 0.9rem; }
-        .hero-img img { width: 220px; height: 220px; margin: 0 auto; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+        }
+
+        /* UTILS */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         
-        /* Tombol Hero ditengahin */
-        .hero div { display: flex; flex-direction: column; align-items: center; }
-    }
+        .btn { padding: 12px 32px; border-radius: 50px; font-weight: 700; cursor: pointer; border: none; transition: 0.3s; text-decoration: none; display: inline-block; }
+        .btn-primary { background-color: var(--accent-green); color: #000; }
+        .btn-primary:hover { transform: scale(1.05) rotate(-2deg); box-shadow: 0 0 20px rgba(204, 255, 0, 0.4); }
 
-    /* MENU GRID */
-    .food-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; margin-bottom: 100px; }
-    /* Note: minmax diubah jadi 160px biar di HP bisa muat 2 kolom kalau layarnya cukup */
+        /* NAVBAR */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 30px 0; }
+        .logo { font-size: 1.8rem; font-weight: 700; letter-spacing: -1px; }
+        .logo span { color: var(--accent-green); }
 
-    .food-card {
-        background: var(--card-bg); border-radius: 24px; padding: 15px;
-        border: 1px solid #333; transition: 0.3s; position: relative;
-    }
-    .food-card:hover { transform: translateY(-5px); border-color: var(--accent-green); }
-    
-    .food-img { width: 100%; height: 160px; object-fit: cover; border-radius: 16px; margin-bottom: 15px; }
-    
-    .category-tag {
-        position: absolute; top: 10px; right: 10px;
-        background: rgba(0,0,0,0.7); color: #fff;
-        padding: 4px 10px; border-radius: 20px; font-size: 0.7rem;
-    }
+        /* HERO */
+        .hero { display: flex; align-items: center; justify-content: space-between; min-height: 60vh; margin-bottom: 50px; }
+        .hero h1 { font-size: 4rem; line-height: 1; margin-bottom: 20px; letter-spacing: -2px; }
+        .hero h1 span { -webkit-text-stroke: 1px var(--accent-green); color: transparent; }
+        .hero-img img { width: 350px; height: 350px; object-fit: cover; border-radius: 50%; border: 2px solid var(--accent-green); animation: float 6s ease-in-out infinite; }
 
-    .price { color: var(--accent-green); font-weight: 700; font-size: 1.1rem; }
-    
-    /* FILTER BUTTONS SCROLLABLE */
-    .filter-container {
-        display: flex; gap: 10px; margin-bottom: 30px; 
-        overflow-x: auto; /* Biar bisa discroll samping di HP */
-        padding-bottom: 10px;
-        -webkit-overflow-scrolling: touch; /* Smooth scroll di iPhone */
-    }
-    .filter-container::-webkit-scrollbar { height: 4px; } /* Scrollbar tipis */
-    .filter-container::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-    
-    .filter-btn {
-        background: var(--card-bg); border: 1px solid #333; color: var(--text-sec);
-        padding: 8px 20px; border-radius: 50px; cursor: pointer; transition: 0.3s;
-        font-family: var(--font-main); font-weight: 500; white-space: nowrap; font-size: 0.9rem;
-    }
-    .filter-btn:hover, .filter-btn.active {
-        background: var(--accent-green); color: #000; border-color: var(--accent-green);
-    }
+        /* MENU GRID */
+        .food-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-bottom: 100px; }
+        
+        .food-card {
+            background: var(--card-bg); border-radius: 24px; padding: 20px;
+            border: 1px solid #333; transition: 0.3s; position: relative;
+        }
+        .food-card:hover { transform: translateY(-10px); border-color: var(--accent-green); }
+        
+        .food-img { width: 100%; height: 200px; object-fit: cover; border-radius: 16px; margin-bottom: 20px; }
+        
+        .category-tag {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(0,0,0,0.7); color: #fff;
+            padding: 4px 12px; border-radius: 20px; font-size: 0.8rem;
+        }
 
-    /* CART SIDEBAR CSS (Sama kayak sebelumnya) */
-    .cart-btn { position: fixed; bottom: 30px; right: 30px; background: var(--accent-green); color: #000; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; z-index: 1000; box-shadow: 0 0 20px rgba(204, 255, 0, 0.5); }
-    .cart-sidebar { position: fixed; top: 0; right: -400px; width: 320px; max-width: 90%; height: 100vh; background: #111; border-left: 1px solid #333; padding: 20px; z-index: 1001; transition: 0.4s; display: flex; flex-direction: column; }
-    .cart-sidebar.active { right: 0; }
-    .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-    .cart-items { flex: 1; overflow-y: auto; }
-    .cart-item { display: flex; gap: 10px; margin-bottom: 15px; background: #222; padding: 10px; border-radius: 10px; }
-    .cart-item img { width: 50px; height: 50px; border-radius: 5px; object-fit: cover; }
-    .cart-total { font-size: 1.5rem; font-weight: bold; color: var(--accent-green); margin: 20px 0; }
-    .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:900; display:none; }
-    .overlay.active { display:block; }
-    .qty-btn { background: #333; color: #fff; width: 25px; height: 25px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; }
-    .qty-btn:hover { background: var(--accent-green); color: #000; }
-    @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        .price { color: var(--accent-green); font-weight: 700; font-size: 1.2rem; }
+
+        /* CART SIDEBAR CSS */
+        .cart-btn {
+            position: fixed; bottom: 30px; right: 30px;
+            background: var(--accent-green); color: #000;
+            width: 60px; height: 60px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; cursor: pointer; z-index: 1000;
+            box-shadow: 0 0 20px rgba(204, 255, 0, 0.5);
+        }
+        .cart-sidebar {
+            position: fixed; top: 0; right: -400px; /* Sembunyi dulu */
+            width: 350px; height: 100vh;
+            background: #111; border-left: 1px solid #333;
+            padding: 20px; z-index: 1001; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex; flex-direction: column;
+        }
+        .cart-sidebar.active { right: 0; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .cart-items { flex: 1; overflow-y: auto; }
+        .cart-item { display: flex; gap: 10px; margin-bottom: 15px; background: #222; padding: 10px; border-radius: 10px; }
+        .cart-item img { width: 50px; height: 50px; border-radius: 5px; object-fit: cover; }
+        .cart-total { font-size: 1.5rem; font-weight: bold; color: var(--accent-green); margin: 20px 0; }
+        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:900; display:none; }
+        .overlay.active { display:block; }
+        
+        /* Tombol Qty Kecil */
+        .qty-btn {
+            background: #333; color: #fff; width: 25px; height: 25px;
+            border-radius: 5px; border: none; cursor: pointer; font-weight: bold;
+            display: inline-flex; align-items: center; justify-content: center; transition: 0.2s;
+        }
+        .qty-btn:hover { background: var(--accent-green); color: #000; }
+
+        /* ANIMATION */
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
     </style>
 </head>
 <body>
@@ -207,13 +176,6 @@
         </section>
 
         <h2 id="menu" style="font-size: 2.5rem; margin-bottom: 30px;">Menu Hype 🔥</h2>
-        
-        <div class="filter-container">
-            <button class="filter-btn active" onclick="setCategory('all', this)">Semua</button>
-            <button class="filter-btn" onclick="setCategory('Makanan', this)">Makanan</button>
-            <button class="filter-btn" onclick="setCategory('Minuman', this)">Minuman</button>
-            <button class="filter-btn" onclick="setCategory('Cemilan', this)">Cemilan</button>
-        </div>
 
         <div class="food-grid">
             <c:forEach items="${genZMenu}" var="item">
@@ -286,22 +248,7 @@
         }).format(number);
     }
 
-    // --- VARIABEL GLOBAL BUAT NYIMPEN FILTER ---
-    let currentCategory = 'all'; 
-
-    // Fungsi Ganti Kategori (Dipanggil pas klik tombol)
-    function setCategory(cat, btn) {
-        currentCategory = cat;
-        
-        // Update warna tombol biar keliatan mana yang aktif
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        // Langsung refresh menu
-        loadMenu(); 
-    }
-
-    // 2. Fungsi Ambil Data ke Server (Auto Update + Filter Logic)
+    // 2. Fungsi Ambil Data ke Server (Auto Update)
     function loadMenu() {
         fetch('?mode=json') // Minta data JSON
             .then(response => {
@@ -312,21 +259,14 @@
                 let html = '';
                 const container = document.querySelector('.food-grid');
                 
-                // >>> LOGIC FILTER BARU DISINI <<<
-                // Kita saring data mentah berdasarkan currentCategory
-                let filteredData = data;
-                if (currentCategory !== 'all') {
-                    filteredData = data.filter(item => item.category === currentCategory);
-                }
-
-                // Cek data hasil filter
-                if (filteredData.length === 0) {
-                    container.innerHTML = '<div class="food-card" style="grid-column: 1/-1; text-align:center; padding:40px;"><h3>Yah, kategori ini kosong! 😭</h3></div>';
+                // Kalau data kosong
+                if (data.length === 0) {
+                    container.innerHTML = '<div class="food-card" style="grid-column: 1/-1; text-align:center;"><h3>Menu Habis!</h3></div>';
                     return;
                 }
 
-                // Loop pake filteredData (bukan data mentah)
-                filteredData.forEach(item => {
+                // Loop data dan bikin HTML Kartu
+                data.forEach(item => {
                     let img = (item.imageUrl && item.imageUrl.length > 5) ? item.imageUrl : 'https://dummyimage.com/300x200/333/fff&text=No+Image';
                     
                     html += `
@@ -362,7 +302,7 @@
     // 3. Jalankan tiap 3 detik
     setInterval(loadMenu, 3000);
 
-    // --- LOGIC SIDEBAR CART (Sama aja) ---
+    // --- LOGIC SIDEBAR CART ---
     function updateCartItem(menuId, change) {
         fetch('cart?action=update&id=' + menuId + '&qty=' + change)
             .then(res => { loadCart(); })
@@ -384,7 +324,7 @@
         fetch('cart?action=view&mode=json')
             .then(res => {
                 if (res.status === 401) {
-                    window.location.href = "login.jsp"; 
+                    window.location.href = "login.jsp"; // Tendang kalau belum login
                     return;
                 }
                 return res.json();
