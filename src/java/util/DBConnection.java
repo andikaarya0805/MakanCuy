@@ -27,6 +27,8 @@ public class DBConnection {
 
     public static Connection getConnection() throws SQLException {
         try {
+            
+            System.out.println("DEBUG: Mencoba konek ke DB Railway...");
             Class.forName("com.mysql.cj.jdbc.Driver");
             return DriverManager.getConnection(URL, DB_USER, DB_PASSWORD);
         } catch (ClassNotFoundException e) {
