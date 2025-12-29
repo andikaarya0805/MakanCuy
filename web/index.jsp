@@ -36,7 +36,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     
     <style>
-       /* --- GEN Z THEME VARIABLES --- */
+      /* --- GEN Z THEME VARIABLES --- */
     :root {
         --bg-color: #0d0d0d;
         --card-bg: #1a1a1a;
@@ -360,7 +360,7 @@
     }
 
     // 3. Jalankan tiap 3 detik
-    setInterval(loadMenu, 1000);
+    setInterval(loadMenu, 3000);
 
     // --- LOGIC SIDEBAR CART (Sama aja) ---
     function updateCartItem(menuId, change) {
