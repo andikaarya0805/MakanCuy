@@ -37,7 +37,7 @@
         .card { background: var(--card); padding: 25px; border: 1px solid #333; border-radius: 15px; margin-bottom: 20px; }
         .card-highlight { border-color: var(--accent); }
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; vertical-align: middle; }
         th { color: var(--accent); text-transform: uppercase; font-size: 0.8rem; }
         .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; text-decoration: none; font-size: 0.9rem; }
         .btn-primary { background: var(--accent); color: #000; width: 100%; margin-top: 10px; }
@@ -45,6 +45,12 @@
         input, select, textarea { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; margin-bottom: 15px; border-radius: 8px; font-family: inherit; }
         .chart-container { position: relative; height: 300px; width: 100%; }
         .user-info { margin-top: auto; padding-top: 20px; border-top: 1px solid #333; font-size: 0.9rem; color: #555; }
+        
+        /* CSS Tambahan untuk Badge Status */
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; border: 1px solid; display: inline-block; }
+        .status-paid { color: #facc15; border-color: #facc15; background: rgba(250, 204, 21, 0.1); }
+        .status-process { color: #4ade80; border-color: #4ade80; background: rgba(74, 222, 128, 0.1); }
+        .status-reject { color: #f87171; border-color: #f87171; background: rgba(248, 113, 113, 0.1); }
     </style>
 </head>
 <body>
@@ -86,12 +92,17 @@
         <div id="tab-history" class="tab-section">
             <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                 <h2>Laporan Transaksi</h2>
-                <button onclick="downloadReport()" class="btn" style="background: #fff;">📄 Download PDF</button>
+                <button onclick="downloadReport()" class="btn" style="background: #fff; color: #000;">📄 Download PDF</button>
             </div>
             <div class="card">
                 <table>
                     <thead>
-                        <tr><th>ID</th><th>Tanggal</th><th>Pelanggan</th><th>Metode</th><th>Total</th></tr>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tanggal</th>
+                            <th>Pelanggan</th>
+                            <th>Status</th> <th>Total</th>
+                            <th>Aksi</th>   </tr>
                     </thead>
                     <tbody id="table-history-body"></tbody>
                 </table>
@@ -120,7 +131,7 @@
                 <div class="card">
                     <h3>➕ Tambah Menu</h3>
                     <form action="admin" method="post">
-                        <input type="text" name="name" required placeholder="Nama Menu">
+                        <input type="hidden" name="action" value="add_menu"> <input type="text" name="name" required placeholder="Nama Menu">
                         <input type="number" name="price" required placeholder="Harga">
                         <select name="category">
                             <option value="Makanan">Makanan</option>
@@ -144,34 +155,77 @@
             const tbody = document.getElementById('table-history-body');
             const revenueText = document.getElementById('total-revenue-text');
             
-            if (!filterElement || !tbody) return; // Safety check
+            if (!filterElement || !tbody) return;
 
             const filter = filterElement.value;
+            // Pastikan URL API ini benar. Kalau belum punya Servlet API, kode ini gak akan dapat data.
             const url = '<%= request.getContextPath() %>/api/admin-stats?filter=' + filter;
             
             try {
                 const res = await fetch(url);
+                if (!res.ok) throw new Error("API Error");
                 const data = await res.json();
 
                 // 1. Update Revenue
                 revenueText.innerText = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(data.totalRevenue);
 
-                // 2. Update Table
+                // 2. Update Table (PAKAI CARA AMAN "+" SUPAYA GAK BENTROK SAMA JSP)
                 tbody.innerHTML = '';
                 const labels = [];
                 const values = [];
 
-                data.history.forEach(item => {
-                    tbody.innerHTML += '<tr>' +
-                        '<td>#' + item.id + '</td>' +
-                        '<td>' + item.date + '</td>' +
-                        '<td>' + item.username + '</td>' +
-                        '<td><span style="border:1px solid #333; padding:2px 6px; border-radius:4px">' + item.method + '</span></td>' +
-                        '<td>Rp ' + item.total.toLocaleString('id-ID') + '</td>' +
-                    '</tr>';
-                    labels.unshift(item.date);
-                    values.unshift(item.total);
-                });
+                if (!data.history || data.history.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#555;">Belum ada data transaksi.</td></tr>';
+                } else {
+                    data.history.forEach(item => {
+                        let statusBadge = '';
+                        let actionButtons = '';
+
+                        // Logic Badge Status
+                        if (item.status === 'PAID') {
+                            statusBadge = '<span class="status-badge status-paid">Menunggu Konfirmasi</span>';
+                            actionButtons = 
+                                '<div style="display:flex; gap:5px;">' +
+                                    '<form action="admin" method="POST">' +
+                                        '<input type="hidden" name="action" value="confirm">' +
+                                        '<input type="hidden" name="id" value="' + item.id + '">' +
+                                        '<button type="submit" class="btn" style="background:#4ade80; color:#000; padding:5px 10px; font-size:0.8rem;">✔ Terima</button>' +
+                                    '</form>' +
+                                    '<form action="admin" method="POST">' +
+                                        '<input type="hidden" name="action" value="reject">' +
+                                        '<input type="hidden" name="id" value="' + item.id + '">' +
+                                        '<button type="submit" class="btn" style="background:#f87171; color:#fff; padding:5px 10px; font-size:0.8rem;">✖ Tolak</button>' +
+                                    '</form>' +
+                                '</div>';
+                        } else if (item.status === 'PROCESSING') {
+                            statusBadge = '<span class="status-badge status-process">Sedang Proses</span>';
+                            actionButtons = '<span style="color:#4ade80; font-size:0.9rem;">✅ Disetujui</span>';
+                        } else if (item.status === 'REJECTED') {
+                            statusBadge = '<span class="status-badge status-reject">Ditolak</span>';
+                            actionButtons = '<span style="color:#f87171; font-size:0.9rem;">❌ Ditolak</span>';
+                        } else {
+                            statusBadge = '<span class="status-badge" style="color:#888; border-color:#555;">' + item.status + '</span>';
+                            actionButtons = '-';
+                        }
+
+                        // Render Baris (Concatenation Style)
+                        tbody.innerHTML += 
+                            '<tr>' +
+                                '<td>#' + item.id + '</td>' +
+                                '<td>' + item.date + '</td>' +
+                                '<td>' +
+                                    '<b>' + item.username + '</b><br>' +
+                                    '<small style="color:#888">' + item.method + '</small>' +
+                                '</td>' +
+                                '<td>' + statusBadge + '</td>' +
+                                '<td>Rp ' + item.total.toLocaleString('id-ID') + '</td>' +
+                                '<td>' + actionButtons + '</td>' +
+                            '</tr>';
+                        
+                        labels.unshift(item.date);
+                        values.unshift(item.total);
+                    });
+                }
 
                 // 3. Update Chart
                 if (salesChart) {
@@ -179,7 +233,10 @@
                     salesChart.data.datasets[0].data = values;
                     salesChart.update();
                 }
-            } catch (err) { console.error("Fetch Error:", err); }
+            } catch (err) { 
+                console.error("Fetch Error:", err);
+                // tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Gagal memuat data API (Cek Console)</td></tr>';
+            }
         }
 
         function initChart() {
@@ -223,7 +280,7 @@
         }
 
         function downloadReport() {
-            const opt = { margin: 1, filename: 'Laporan_MakanCuy.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+            const opt = { margin: 1, filename: 'Laporan_MakanCuy.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } };
             const element = document.getElementById('tab-history');
             html2pdf().set(opt).from(element).save();
         }
@@ -231,7 +288,7 @@
         window.onload = () => {
             initChart();
             fetchData();
-            setInterval(fetchData, 1000); // Polling data tiap 5 detik
+            setInterval(fetchData, 1000); 
             const lastTab = localStorage.getItem('activeTab') || 'dashboard';
             switchTab(lastTab);
         };

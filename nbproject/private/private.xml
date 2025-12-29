@@ -8,7 +8,6 @@
             <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/model/MenuItem.java</file>
             <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/DAO/MenuDAO.java</file>
             <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/Controller/Home.java</file>
-            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/Controller/Buy.java</file>
             <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/Controller/Admin.java</file>
             <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/web/admin.jsp</file>
             <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/DAO/UserDAO.java</file>
@@ -18,6 +17,12 @@
             <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/DAO/CartDAO.java</file>
             <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/Controller/Cart.java</file>
             <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/model/User.java</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/DAO/OrderDAO.java</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/Controller/AdminAPI.java</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/model/Order.java</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/Controller/UserHistory.java</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/web/history.jsp</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/Controller/UserHistoryAPI.java</file>
         </group>
     </open-files>
 </project-private>

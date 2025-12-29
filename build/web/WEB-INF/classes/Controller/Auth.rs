@@ -1,1 +1,0 @@
-com.makancuy.controller.Auth

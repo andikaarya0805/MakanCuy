@@ -34,9 +34,15 @@ public class AdminAPI extends HttpServlet {
             Map<String, Object> map = new HashMap<>();
             map.put("id", o.getId());
             map.put("username", o.getUsername());
-            map.put("total", o.getTotal());
-            map.put("method", o.getMethod());
-            map.put("date", sdf.format(o.getDate())); // Tanggal dikirim sebagai String
+            map.put("total", o.getTotal()); // Pastikan di Model Order namanya getTotal() atau getTotalPrice()
+            map.put("method", o.getMethod()); // Pastikan di Model Order namanya getMethod() atau getPaymentMethod()
+            map.put("date", sdf.format(o.getDate())); 
+            
+            // --- INI YANG KURANG TADI ---
+            // JavaScript butuh field "status" buat nentuin warna badge & tombol terima/tolak
+            map.put("status", o.getStatus()); 
+            // ----------------------------
+
             historyList.add(map);
         }
 

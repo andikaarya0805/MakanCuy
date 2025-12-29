@@ -1,6 +1,28 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ page import="com.makancuy.dao.MenuDAO" %>
+<%@ page import="com.makancuy.model.MenuItem" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.google.gson.Gson" %>
+
+<%
+    // --- 1. LOGIC JAVA (JANGAN DIHAPUS) ---
+    MenuDAO menuDAO = new MenuDAO();
+    List<MenuItem> menuList = menuDAO.getAllMenus();
+
+    // A. Handle Request JSON (Buat Auto-Update JavaScript)
+    String mode = request.getParameter("mode");
+    if ("json".equals(mode)) {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(new Gson().toJson(menuList));
+        return; // Stop di sini biar gak ngerender HTML dobel
+    }
+
+    // B. Handle Request Biasa (Buat Tampilan Awal)
+    request.setAttribute("genZMenu", menuList);
+%>
 
 <!DOCTYPE html>
 <html lang="id">
@@ -121,6 +143,10 @@
                             Halo, ${sessionScope.user.username} 👋
                         </span>
                         
+                        <a href="history" style="color: #fff; text-decoration: none; font-size: 0.9rem; transition:0.3s;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#fff'">
+                            📜 Riwayat
+                        </a>
+
                         <c:if test="${sessionScope.user.role == 'admin'}">
                             <a href="admin" style="color: #fff; text-decoration: none; font-size: 0.9rem; border-bottom: 1px solid #fff;">Dashboard</a>
                         </c:if>
