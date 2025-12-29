@@ -67,12 +67,65 @@
         .logo { font-size: 1.8rem; font-weight: 700; letter-spacing: -1px; }
         .logo span { color: var(--accent-green); }
 
-        /* HERO */
-        .hero { display: flex; align-items: center; justify-content: space-between; min-height: 60vh; margin-bottom: 50px; }
-        .hero h1 { font-size: 4rem; line-height: 1; margin-bottom: 20px; letter-spacing: -2px; }
-        .hero h1 span { -webkit-text-stroke: 1px var(--accent-green); color: transparent; }
-        .hero-img img { width: 350px; height: 350px; object-fit: cover; border-radius: 50%; border: 2px solid var(--accent-green); animation: float 6s ease-in-out infinite; }
+        /* HERO SECTION ADAPTIVE */
+.hero { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    min-height: 60vh; 
+    margin-bottom: 50px; 
+    /* Tambahan buat jaga-jaga di layar nanggung */
+    flex-wrap: wrap; 
+}
 
+.hero h1 { 
+    font-size: 4rem; 
+    line-height: 1; 
+    margin-bottom: 20px; 
+    letter-spacing: -2px; 
+}
+
+.hero-img img { 
+    width: 350px; 
+    height: 350px; 
+    object-fit: cover; 
+    border-radius: 50%; 
+    border: 2px solid var(--accent-green); 
+    animation: float 6s ease-in-out infinite; 
+}
+
+/* --- MOBILE RESPONSIVE (MEDIA QUERY) --- */
+@media (max-width: 768px) {
+    .hero {
+        flex-direction: column-reverse; /* Gambar pindah ke ATAS biar visual dapet duluan */
+        text-align: center; /* Text jadi rata tengah */
+        justify-content: center;
+        gap: 30px; /* Jarak antara gambar dan text */
+        margin-top: 30px;
+    }
+
+    .hero h1 {
+        font-size: 2.8rem; /* Font dikecilin biar gak jebol layar */
+    }
+    
+    .hero p {
+        font-size: 1rem; /* Text deskripsi juga disesuaikan */
+        padding: 0 10px;
+    }
+
+    .hero-img img {
+        width: 240px; /* Gambar dikecilin */
+        height: 240px;
+        margin: 0 auto; /* Tengahin gambar */
+    }
+    
+    /* Tombol juga ditengahin */
+    .hero div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+}
         /* MENU GRID */
         .food-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-bottom: 100px; }
         
@@ -91,6 +144,20 @@
         }
 
         .price { color: var(--accent-green); font-weight: 700; font-size: 1.2rem; }
+        
+        /* FILTER BUTTONS */
+        .filter-container {
+            display: flex; gap: 15px; margin-bottom: 30px; overflow-x: auto; padding-bottom: 10px;
+        }
+        .filter-btn {
+            background: var(--card-bg); border: 1px solid #333; color: var(--text-sec);
+            padding: 10px 24px; border-radius: 50px; cursor: pointer; transition: 0.3s;
+            font-family: var(--font-main); font-weight: 500; white-space: nowrap;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--accent-green); color: #000; border-color: var(--accent-green);
+            transform: scale(1.05);
+        }
 
         /* CART SIDEBAR CSS */
         .cart-btn {
@@ -176,6 +243,13 @@
         </section>
 
         <h2 id="menu" style="font-size: 2.5rem; margin-bottom: 30px;">Menu Hype 🔥</h2>
+        
+        <div class="filter-container">
+            <button class="filter-btn active" onclick="setCategory('all', this)">Semua</button>
+            <button class="filter-btn" onclick="setCategory('Makanan', this)">Makanan</button>
+            <button class="filter-btn" onclick="setCategory('Minuman', this)">Minuman</button>
+            <button class="filter-btn" onclick="setCategory('Cemilan', this)">Cemilan</button>
+        </div>
 
         <div class="food-grid">
             <c:forEach items="${genZMenu}" var="item">
@@ -294,6 +368,78 @@
                 });
                 
                 // Timpa HTML lama dengan yang baru
+                container.innerHTML = html;
+            })
+            .catch(err => console.error('Error Auto Update:', err));
+    }
+    
+    // --- VARIABEL GLOBAL BUAT NYIMPEN FILTER ---
+    let currentCategory = 'all'; 
+
+    // Fungsi Ganti Kategori (Dipanggil pas klik tombol)
+    function setCategory(cat, btn) {
+        currentCategory = cat;
+        
+        // Update warna tombol biar keliatan mana yang aktif
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Langsung refresh menu
+        loadMenu(); 
+    }
+
+    // --- FUNGSI LOAD MENU (YANG SUDAH DI-UPGRADE) ---
+    function loadMenu() {
+        fetch('?mode=json') 
+            .then(response => {
+                if (!response.ok) throw new Error("Gagal fetch data");
+                return response.json();
+            })
+            .then(data => {
+                let html = '';
+                const container = document.querySelector('.food-grid');
+                
+                // >>> LOGIC FILTER BARU DISINI <<<
+                // Kalau kategori bukan 'all', kita buang data yang gak cocok
+                let filteredData = data;
+                if (currentCategory !== 'all') {
+                    filteredData = data.filter(item => item.category === currentCategory);
+                }
+
+                // Cek data hasil filter (bukan data mentah)
+                if (filteredData.length === 0) {
+                    container.innerHTML = '<div class="food-card" style="grid-column: 1/-1; text-align:center; padding:40px;"><h3>Yah, kategori ini kosong! 😭</h3></div>';
+                    return;
+                }
+
+                // Loop pake filteredData
+                filteredData.forEach(item => {
+                    let img = (item.imageUrl && item.imageUrl.length > 5) ? item.imageUrl : 'https://dummyimage.com/300x200/333/fff&text=No+Image';
+                    
+                    html += `
+                        <div class="food-card">
+                            <span class="category-tag">` + item.category + `</span>
+                            <img src="` + img + `" class="food-img" alt="` + item.name + `">
+                            
+                            <div class="food-info">
+                                <h3 style="margin-bottom: 5px; color: #fff;">` + item.name + `</h3>
+                                <p style="color: var(--text-sec); font-size: 0.9rem; margin-bottom: 20px;">
+                                    ` + item.description + `
+                                </p>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="price">` + rupiah(item.price) + `</span>
+
+                                <a href="cart?action=add&id=` + item.id + `" 
+                                   style="background: #fff; color: #000; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight:bold; cursor: pointer; text-decoration: none; transition: 0.2s;">
+                                   +
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                });
+                
                 container.innerHTML = html;
             })
             .catch(err => console.error('Error Auto Update:', err));
