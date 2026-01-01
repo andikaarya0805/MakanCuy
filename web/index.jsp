@@ -12,7 +12,6 @@
     List<MenuItem> menuList = menuDAO.getAllMenus();
 
     // A. Handle Request JSON (Buat Auto-Update JavaScript)
-    // Kalau browser minta data JSON, kita kasih JSON terus stop (return).
     String mode = request.getParameter("mode");
     if ("json".equals(mode)) {
         response.setContentType("application/json");
@@ -69,28 +68,27 @@
     .logo span { color: var(--accent-green); }
     .nav-links { display: flex; align-items: center; gap: 20px; }
 
-    /* === HERO SECTION (DESKTOP DEFAULT: KIRI-KANAN) === */
+    /* === HERO SECTION === */
     .hero { 
         display: flex; 
         align-items: center; 
-        justify-content: space-between; /* Teks kiri, Gambar kanan */
-        flex-direction: row; /* WAJIB ROW BIAR GAK NUMPUK */
+        justify-content: space-between; 
+        flex-direction: row; 
         min-height: 60vh; 
         margin-bottom: 50px; 
     }
     .hero h1 { font-size: 4rem; line-height: 1; margin-bottom: 20px; letter-spacing: -2px; }
     .hero h1 span { -webkit-text-stroke: 1px var(--accent-green); color: transparent; }
-    .hero p { color: var(--text-sec); margin-bottom: 30px; max-width: 500px; } /* Batasi lebar teks biar rapi */
+    .hero p { color: var(--text-sec); margin-bottom: 30px; max-width: 500px; } 
     
     .hero-img img { 
         width: 350px; height: 350px; object-fit: cover; border-radius: 50%; 
         border: 2px solid var(--accent-green); animation: float 6s ease-in-out infinite; 
     }
 
-    /* === MENU GRID (DESKTOP DEFAULT: 4 KOLOM FIX) === */
+    /* === MENU GRID === */
     .food-grid { 
         display: grid; 
-        /* INI KUNCINYA: Paksa 4 kolom. Kalau item cuma 1, dia tetep 1/4 lebar layar */
         grid-template-columns: repeat(4, 1fr); 
         gap: 20px; 
         margin-bottom: 100px; 
@@ -145,35 +143,46 @@
     
     @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
 
-    /* === MOBILE RESPONSIVE (KHUSUS HP) === */
-    /* Apapun yang ditulis di sini cuma berlaku kalau layar < 768px */
+    /* === ANDROID STYLE TOAST NOTIFICATION (NEW) === */
+    .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 380px; }
+    .toast {
+        background: rgba(20, 20, 20, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid #333;
+        border-left: 4px solid var(--accent-green);
+        color: #fff;
+        padding: 15px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        animation: slideDown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        opacity: 1;
+        transition: opacity 0.5s ease;
+        margin-bottom: 10px;
+    }
+    .toast-icon { font-size: 1.5rem; }
+    .toast-content h4 { margin: 0; font-size: 0.95rem; color: var(--accent-green); margin-bottom: 3px; font-weight: 700; }
+    .toast-content p { margin: 0; font-size: 0.85rem; color: #ccc; line-height: 1.3; }
+    
+    @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* === MOBILE RESPONSIVE === */
     @media (max-width: 768px) {
-        /* Navbar Jadi Tumpuk */
         nav { flex-direction: column; gap: 20px; text-align: center; }
         .nav-links { flex-direction: column; gap: 15px; }
-
-        /* Hero Jadi Tumpuk (Gambar di atas) */
-        .hero {
-            flex-direction: column-reverse; /* Gambar naik ke atas */
-            text-align: center; justify-content: center; 
-            gap: 30px; margin-top: 20px;
-        }
+        .hero { flex-direction: column-reverse; text-align: center; justify-content: center; gap: 30px; margin-top: 20px; }
         .hero h1 { font-size: 2.5rem; }
         .hero-img img { width: 220px; height: 220px; margin: 0 auto; }
-        .hero div { display: flex; flex-direction: column; align-items: center; }
-        .hero p { max-width: 100%; padding: 0 10px; }
-
-        /* Grid Jadi 2 Kolom Fix */
-        .food-grid {
-            grid-template-columns: repeat(2, 1fr); /* 2 Kolom biar rapi di HP */
-            gap: 15px;
-        }
+        .food-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
         .food-img { height: 140px; }
-        .food-info h3 { font-size: 1rem; }
     }
     </style>
 </head>
 <body>
+
+    <div id="toastContainer" class="toast-container"></div>
 
     <div class="container">
         
@@ -187,7 +196,7 @@
                             <span style="color: var(--accent-green); font-weight: bold; font-size: 1.1rem;">
                                 Halo, ${sessionScope.user.username} 👋
                             </span>
-                            
+
                             <a href="history" style="color: #fff; text-decoration: none; font-size: 0.9rem; transition:0.3s;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#fff'">
                                 📜 Riwayat
                             </a>
@@ -235,7 +244,6 @@
             <c:forEach items="${genZMenu}" var="item">
                 <div class="food-card">
                     <span class="category-tag">${item.category}</span>
-                    
                     <c:set var="gambar" value="${item.imageUrl}" />
                     <c:if test="${empty gambar}">
                         <c:set var="gambar" value="https://dummyimage.com/300x200/333/fff&text=No+Image" />
@@ -293,29 +301,94 @@
     </div>
 
 <script>
-    // --- UTILS ---
-    const rupiah = (number) => {
-        return new Intl.NumberFormat("id-ID", {
-            style: "currency",
-            currency: "IDR",
-            minimumFractionDigits: 0
-        }).format(number);
+    const rupiah = (number) => new Intl.NumberFormat("id-ID", {style: "currency", currency: "IDR", minimumFractionDigits: 0}).format(number);
+
+    // ==========================================
+    // 🔔 1. SYSTEM NOTIFIKASI REAL-TIME (BARU)
+    // ==========================================
+    
+    // Simpan status terakhir di browser biar gak spam notif
+    let lastStatus = localStorage.getItem('lastStatus') || "";
+    let lastOrderId = localStorage.getItem('lastOrderId') || 0;
+
+    function checkOrderStatus() {
+        // Panggil API Backend (Pastikan file UserStatusAPI.java udah ada)
+        fetch('api/user-status')
+            .then(res => res.json())
+            .then(data => {
+                if (!data.status) return; // Kalau gak ada order aktif, skip
+
+                // Cek apakah ada perubahan status atau ID order baru
+                if (data.status !== lastStatus || data.orderId != lastOrderId) {
+                    
+                    if (data.status === 'PROCESSING') {
+                        showToast("👨‍🍳 Pesanan Dimasak", "Koki lagi beraksi, tunggu bentar ya!");
+                    } else if (data.status === 'DELIVERING') {
+                        showToast("🛵 Pesanan Diantar", "Makananmu lagi OTW ke meja!");
+                    } else if (data.status === 'COMPLETED') {
+                        showToast("✅ Pesanan Selesai", "Selamat menikmati makanannya! 😋");
+                    } else if (data.status === 'REJECTED') {
+                        showToast("❌ Pesanan Dibatalkan", "Maaf, pesananmu ditolak admin.");
+                    }
+
+                    // Update simpanan lokal
+                    lastStatus = data.status;
+                    lastOrderId = data.orderId;
+                    localStorage.setItem('lastStatus', lastStatus);
+                    localStorage.setItem('lastOrderId', lastOrderId);
+                }
+            })
+            .catch(err => {
+                // Silent error (biar gak nuhin console)
+            });
     }
 
-    // --- VARIABEL GLOBAL FILTER ---
+    function showToast(title, msg) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        
+        // Ikon sesuai judul
+        let icon = '🔔';
+        if(title.includes('Dimasak')) icon = '🔥';
+        if(title.includes('Diantar')) icon = '🛵';
+        if(title.includes('Selesai')) icon = '😋';
+        if(title.includes('Dibatalkan')) icon = '❌';
+
+        toast.innerHTML = `
+            <div class="toast-icon">` + icon + `</div>
+            <div class="toast-content">
+                <h4>` + title + `</h4>
+                <p>` + msg + `</p>
+            </div>
+        `;
+
+        container.appendChild(toast);
+
+        // Notif hilang otomatis dalam 5 detik
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 500);
+        }, 5000);
+    }
+
+    // Jalankan cek status tiap 5 detik
+    setInterval(checkOrderStatus, 1000);
+
+
+    // ==========================================
+    // 2. LOGIC MENU & CART (LAMA)
+    // ==========================================
+    
     let currentCategory = 'all'; 
 
-    // --- FUNGSI GANTI KATEGORI ---
     function setCategory(cat, btn) {
         currentCategory = cat;
-        // Update tombol aktif
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        // Refresh menu
         loadMenu(); 
     }
 
-    // --- FUNGSI LOAD MENU (AUTO UPDATE + FILTER) ---
     function loadMenu() {
         fetch('?mode=json')
             .then(response => {
@@ -326,19 +399,16 @@
                 let html = '';
                 const container = document.querySelector('.food-grid');
                 
-                // 1. FILTER DATA
                 let filteredData = data;
                 if (currentCategory !== 'all') {
                     filteredData = data.filter(item => item.category === currentCategory);
                 }
 
-                // 2. CEK KOSONG
                 if (filteredData.length === 0) {
                     container.innerHTML = '<div class="food-card" style="grid-column: 1/-1; text-align:center; padding:40px;"><h3>Yah, kategori ini kosong! 😭</h3></div>';
                     return;
                 }
 
-                // 3. RENDER HTML
                 filteredData.forEach(item => {
                     let img = (item.imageUrl && item.imageUrl.length > 5) ? item.imageUrl : 'https://dummyimage.com/300x200/333/fff&text=No+Image';
                     
@@ -371,10 +441,9 @@
             .catch(err => console.error('Error Auto Update:', err));
     }
 
-    // --- AUTO UPDATE TIAP 3 DETIK ---
-    setInterval(loadMenu, 3000);
+    // Auto Update Menu (Biar kalau admin ubah harga, user langsung liat)
+    setInterval(loadMenu, 1000);
 
-    // --- CART LOGIC ---
     function updateCartItem(menuId, change) {
         fetch('cart?action=update&id=' + menuId + '&qty=' + change)
             .then(res => { loadCart(); })
