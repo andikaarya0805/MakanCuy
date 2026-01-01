@@ -459,7 +459,7 @@
             setInterval(function() {
                 if(document.getElementById('tab-orders').classList.contains('active')) loadOrders();
                 if(document.getElementById('tab-dashboard').classList.contains('active')) loadDashboard();
-            }, 5000);
+            }, 1000);
         };
     </script>
 </body>
