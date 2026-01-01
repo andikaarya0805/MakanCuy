@@ -367,11 +367,12 @@
                                 // DROPDOWN CALLS openConfirm()
                                 '<div class="action-container">' +
                                     '<select class="status-select" onchange="openConfirm(' + order.id + ', this.value)">' +
-                                        '<option disabled selected>⚡ Update Status...</option>' +
-                                        '<option value="PROCESSING">🔥 Proses Masak</option>' +
-                                        '<option value="DELIVERING">🛵 Antar Pesanan</option>' +
-                                        '<option value="COMPLETED">✅ Pesanan Selesai</option>' +
                                         '<option value="REJECTED">❌ Tolak Pesanan</option>' +
+                                        '<option disabled selected>⚡ Pesanan diterima</option>' +
+                                        '<option value="PROCESSING">🔥 Proses Masak</option>' +
+                                        '<option value="COMPLETED">✅ Pesanan Selesai</option>' +
+                                        '<option value="DELIVERING">🛵 Antar Pesanan</option>' +
+ 
                                     '</select>' +
                                 '</div>' +
                             '</div>';
