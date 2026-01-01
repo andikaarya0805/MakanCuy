@@ -2,68 +2,118 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice #${orderId}</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
     <style>
-        body { background: #222; display: flex; justify-content: center; padding: 50px; font-family: 'Space Mono', monospace; }
+        * { box-sizing: border-box; }
+
+        body { 
+            background: #222; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; /* Tengah secara vertikal */
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 20px; /* Padding dikit biar gak nempel layar HP */
+            font-family: 'Space Mono', monospace; 
+        }
         
         .receipt {
-            background: #fff; width: 350px; padding: 20px; color: #000;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5); position: relative;
+            background: #fff; 
+            width: 100%; 
+            max-width: 380px; /* Batas lebar struk di laptop */
+            padding: 25px; 
+            color: #000;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5); 
+            position: relative;
+            /* Biar pas digenerate PDF gak kepotong */
+            margin: auto; 
         }
         
-        /* CSS Gerigi Kertas (Biar tetep estetik di PDF) */
+        /* GERIGI KERTAS (Atas Bawah) */
         .receipt::before {
-            content: ""; position: absolute; top: -10px; left: 0; width: 100%; height: 10px;
-            background: linear-gradient(135deg, #fff 5px, transparent 0) 0 5px,
-                        linear-gradient(-135deg, #fff 5px, transparent 0) 0 5px;
-            background-size: 20px 10px; background-repeat: repeat-x;
+            content: ""; position: absolute; top: -6px; left: 0; width: 100%; height: 6px;
+            background: linear-gradient(135deg, #fff 3px, transparent 0) 0 3px,
+                        linear-gradient(-135deg, #fff 3px, transparent 0) 0 3px;
+            background-size: 6px 6px; background-repeat: repeat-x;
         }
         .receipt::after {
-            content: ""; position: absolute; bottom: -10px; left: 0; width: 100%; height: 10px;
-            background: linear-gradient(45deg, #fff 5px, transparent 0) 0 5px,
-                        linear-gradient(-45deg, #fff 5px, transparent 0) 0 5px;
-            background-size: 20px 10px; background-repeat: repeat-x; transform: rotate(180deg);
+            content: ""; position: absolute; bottom: -6px; left: 0; width: 100%; height: 6px;
+            background: linear-gradient(45deg, #fff 3px, transparent 0) 0 3px,
+                        linear-gradient(-45deg, #fff 3px, transparent 0) 0 3px;
+            background-size: 6px 6px; background-repeat: repeat-x; transform: rotate(180deg);
         }
 
-        h2 { text-align: center; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
-        .meta { font-size: 0.8rem; border-bottom: 2px dashed #000; padding: 10px 0; margin-bottom: 15px; }
-        .item { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 5px; }
-        .total-section { border-top: 2px dashed #000; margin-top: 15px; padding-top: 10px; font-weight: bold; font-size: 1.1rem; display: flex; justify-content: space-between; }
-        .footer { text-align: center; margin-top: 20px; font-size: 0.7rem; color: #555; }
+        h2 { text-align: center; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 2px; font-size: 1.5rem; }
+        .cabang { text-align: center; font-size: 0.8rem; margin-bottom: 20px; color: #555; }
         
-        .close-btn { position: absolute; top: 15px; right: 20px; text-decoration: none; color: #000; font-size: 1.5rem; font-weight: bold; line-height: 1; }
-        .btn-print { display: block; width: 100%; padding: 12px; background: #ccff00; color: #000; text-align: center; border: none; font-weight: bold; font-size: 0.9rem; cursor: pointer; margin-top: 20px; }
+        .meta { font-size: 0.8rem; border-bottom: 2px dashed #000; padding-bottom: 15px; margin-bottom: 15px; }
+        .meta div { display: flex; justify-content: space-between; margin-bottom: 5px; }
         
-        /* Kelas buat ngumpetin elemen pas digenerate PDF */
-        .hide-on-pdf { display: none !important; }
+        .item { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px; }
+        .item-name { font-weight: bold; }
+        
+        .total-section { 
+            border-top: 2px dashed #000; margin-top: 15px; padding-top: 15px; 
+            font-weight: bold; font-size: 1.2rem; display: flex; justify-content: space-between; 
+        }
+        
+        .footer { text-align: center; margin-top: 30px; font-size: 0.7rem; color: #555; line-height: 1.5; }
+        
+        /* BUTTONS (Dihide pas Print) */
+        .actions { margin-top: 25px; display: flex; gap: 10px; flex-direction: column; }
+        
+        .btn-print { 
+            display: block; width: 100%; padding: 15px; 
+            background: #000; color: #fff; text-align: center; border: none; 
+            font-weight: bold; font-size: 1rem; cursor: pointer; border-radius: 8px;
+        }
+        .btn-home {
+            display: block; width: 100%; padding: 15px; 
+            background: #eee; color: #000; text-align: center; border: none; 
+            font-weight: bold; font-size: 1rem; cursor: pointer; text-decoration: none; border-radius: 8px;
+        }
+        
+        /* CLOSE BUTTON (X) */
+        .close-absolute {
+            position: absolute; top: 15px; right: 20px; 
+            text-decoration: none; color: #000; font-size: 1.5rem; font-weight: bold; line-height: 1;
+        }
+
     </style>
 </head>
 <body>
 
     <div class="receipt" id="area-cetak">
         
-        <a href="./" class="close-btn" data-html2canvas-ignore="true">&times;</a>
+        <a href="./" class="close-absolute" data-html2canvas-ignore="true">&times;</a>
 
         <h2>MAKANCUY.</h2>
-        <div style="text-align: center; font-size: 0.8rem;">Cabang : Jomokerto  </div>
+        <div class="cabang">Cabang: Jakarta Selatan</div>
         
         <div class="meta">
-            <div>Order ID: #${orderId}</div>
-            <div style="text-transform: uppercase; font-weight: bold;">Pelanggan: ${sessionScope.user.username}</div>
-            <div>Tgl: ${orderDate}</div>
-            <div>Bayar: ${paymentMethod}</div>
+            <div><span>NO. ORDER</span> <span>#${orderId}</span></div>
+            <div><span>PELANGGAN</span> <span>${sessionScope.user.username}</span></div>
+            <div><span>TANGGAL</span> <span>${orderDate}</span></div>
+            <div><span>METODE</span> <span>${paymentMethod}</span></div>
         </div>
 
         <c:forEach items="${orderItems}" var="item">
             <div class="item">
-                <span>${item.quantity}x ${item.menu.name}</span>
+                <span class="item-name">${item.quantity}x ${item.menu.name}</span>
                 <span>
                     <fmt:setLocale value="id_ID"/>
                     <fmt:formatNumber value="${item.menu.price * item.quantity}" maxFractionDigits="0"/>
@@ -79,13 +129,19 @@
         </div>
 
         <div class="footer">
-            <p>TERIMA KASIH SUDAH JAJAN.<br>PERUT KENYANG, HATI SENANG.</p>
-            <p>--- LUNAS (${paymentMethod}) ---</p>
+            TERIMA KASIH SUDAH JAJAN.<br>
+            PERUT KENYANG, HATI SENANG.<br>
+            SIMPAN STRUK INI SEBAGAI BUKTI.
         </div>
 
-        <button onclick="downloadPDF()" class="btn-print" data-html2canvas-ignore="true">
-            ⬇️ CETAK STRUK
-        </button>
+        <div class="actions" data-html2canvas-ignore="true">
+            <button onclick="downloadPDF()" class="btn-print">
+                ⬇️ SIMPAN PDF (CETAK)
+            </button>
+            <a href="./" class="btn-home">
+                🏠 BALIK KE MENU
+            </a>
+        </div>
     </div>
 
     <script>
@@ -93,16 +149,18 @@
             // Ambil elemen struk
             var element = document.getElementById('area-cetak');
             
-            // Settingan PDF
+            // Settingan PDF yang Pas buat Struk
             var opt = {
-                margin:       [0, 0, 0, 0], // Margin atas, kiri, bawah, kanan
-                filename:     'Invoice_MakanCuy_#${orderId}.pdf', // Nama file otomatis
+                margin:       [0, 0, 0, 0], 
+                filename:     'Struk_MakanCuy_#${orderId}.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 }, // Resolusi biar tajam
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+                html2canvas:  { scale: 2, scrollY: 0 }, // Scale 2 biar tajem di HP
+                jsPDF:        { unit: 'in', format: [3.5, 6], orientation: 'portrait' } 
+                // Format [3.5, 6] inci itu mirip ukuran kertas struk panjang, bukan A4.
+                // Jadi hasilnya di HP bakal full screen struk, gak ada kertas putih sisa banyak.
             };
 
-            // Generate dan Save
+            // Generate
             html2pdf().set(opt).from(element).save();
         }
     </script>
