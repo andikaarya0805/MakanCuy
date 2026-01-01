@@ -367,14 +367,14 @@
 
         container.appendChild(toast);
 
-        // Notif hilang otomatis dalam 5 detik
+        // Notif hilang otomatis dalam 9 detik
         setTimeout(() => {
             toast.style.opacity = '0';
             setTimeout(() => toast.remove(), 500);
         }, 9000);
     }
 
-    // Jalankan cek status tiap 5 detik
+    // Jalankan cek status tiap 1 detik
     setInterval(checkOrderStatus, 1000);
 
 
