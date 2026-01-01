@@ -311,9 +311,11 @@
     let lastStatus = localStorage.getItem('lastStatus') || "";
     let lastOrderId = localStorage.getItem('lastOrderId') || 0;
 
-    function checkOrderStatus() {
-        // Panggil API Backend (Pastikan file UserStatusAPI.java udah ada)
-        fetch('api/user-status')
+        function checkOrderStatus() {
+        // [UPDATE] Tambahin timestamp (?t=...) biar browser gak nge-cache data lama
+        const timestamp = new Date().getTime(); 
+        
+        fetch('api/user-status?t=' + timestamp) // <--- UBAH BARIS INI
             .then(res => res.json())
             .then(data => {
                 if (!data.status) return; // Kalau gak ada order aktif, skip
