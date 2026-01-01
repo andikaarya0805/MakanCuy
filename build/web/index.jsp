@@ -1,4 +1,10 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%-- 
+    Document   : index
+    Created on : Dec 20, 2025, 4:57:31?PM
+    Author     : andik
+--%><
+
+%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ page import="com.makancuy.dao.MenuDAO" %>
@@ -194,11 +200,11 @@
                     <c:when test="${not empty sessionScope.user}">
                         <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap; justify-content: center;">
                             <span style="color: var(--accent-green); font-weight: bold; font-size: 1.1rem;">
-                                Halo, ${sessionScope.user.username} 👋
+                                Halo, ${sessionScope.user.username} ?
                             </span>
 
                             <a href="history" style="color: #fff; text-decoration: none; font-size: 0.9rem; transition:0.3s;" onmouseover="this.style.color='#ccff00'" onmouseout="this.style.color='#fff'">
-                                📜 Riwayat
+                                ? Riwayat
                             </a>
 
                             <c:if test="${sessionScope.user.role == 'admin'}">
@@ -224,14 +230,14 @@
             <div>
                 <h1>PERUT<br><span>KOSONG?</span><br>GASLAH.</h1>
                 <p style="color: var(--text-sec); margin-bottom: 30px;">Makanan enak, harga mahasiswa, vibes asik.</p>
-                <a href="#menu" class="btn btn-primary">Lihat Menu ➜</a>
+                <a href="#menu" class="btn btn-primary">Lihat Menu ?</a>
             </div>
             <div class="hero-img">
                 <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600" alt="Burger">
             </div>
         </section>
 
-        <h2 id="menu" style="font-size: 2.5rem; margin-bottom: 30px;">Menu Hype 🔥</h2>
+        <h2 id="menu" style="font-size: 2.5rem; margin-bottom: 30px;">Menu Hype ?</h2>
         
         <div class="filter-container">
             <button class="filter-btn active" onclick="setCategory('all', this)">Semua</button>
@@ -278,13 +284,13 @@
         </footer>
     </div>
 
-    <div class="cart-btn" onclick="toggleCart()">🛒</div>
+    <div class="cart-btn" onclick="toggleCart()">?</div>
     <div class="overlay" onclick="toggleCart()"></div>
 
     <div class="cart-sidebar">
         <div class="cart-header">
             <h2>Keranjang</h2>
-            <span style="cursor:pointer; font-size:1.5rem;" onclick="toggleCart()">×</span>
+            <span style="cursor:pointer; font-size:1.5rem;" onclick="toggleCart()">�</span>
         </div>
         
         <div class="cart-items" id="cartList">
@@ -296,7 +302,7 @@
                 <span>Total:</span>
                 <span class="cart-total" id="cartTotal">Rp 0</span>
             </div>
-            <a href="Checkout.jsp" class="btn btn-primary" style="width:100%; text-align:center;">CHECKOUT ➔</a>
+            <a href="Checkout.jsp" class="btn btn-primary" style="width:100%; text-align:center;">CHECKOUT ?</a>
         </div>
     </div>
 
@@ -304,7 +310,7 @@
     const rupiah = (number) => new Intl.NumberFormat("id-ID", {style: "currency", currency: "IDR", minimumFractionDigits: 0}).format(number);
 
     // ==========================================
-    // 🔔 1. SYSTEM NOTIFIKASI REAL-TIME (BARU)
+    // ? 1. SYSTEM NOTIFIKASI REAL-TIME (BARU)
     // ==========================================
     
     // Simpan status terakhir di browser biar gak spam notif
@@ -324,13 +330,13 @@
                 if (data.status !== lastStatus || data.orderId != lastOrderId) {
                     
                     if (data.status === 'PROCESSING') {
-                        showToast("👨‍🍳 Pesanan Dimasak", "Koki lagi beraksi, tunggu bentar ya!");
+                        showToast("??? Pesanan Dimasak", "Koki lagi beraksi, tunggu bentar ya!");
                     } else if (data.status === 'DELIVERING') {
-                        showToast("🛵 Pesanan Diantar", "Makananmu lagi OTW ke meja!");
+                        showToast("? Pesanan Diantar", "Makananmu lagi OTW ke meja!");
                     } else if (data.status === 'COMPLETED') {
-                        showToast("✅ Pesanan Selesai", "Selamat menikmati makanannya! 😋");
+                        showToast("? Pesanan Selesai", "Selamat menikmati makanannya! ?");
                     } else if (data.status === 'REJECTED') {
-                        showToast("❌ Pesanan Dibatalkan", "Maaf, pesananmu ditolak admin.");
+                        showToast("? Pesanan Dibatalkan", "Maaf, pesananmu ditolak admin.");
                     }
 
                     // Update simpanan lokal
@@ -351,11 +357,11 @@
         toast.className = 'toast';
         
         // Ikon sesuai judul
-        let icon = '🔔';
-        if(title.includes('Dimasak')) icon = '🔥';
-        if(title.includes('Diantar')) icon = '🛵';
-        if(title.includes('Selesai')) icon = '😋';
-        if(title.includes('Dibatalkan')) icon = '❌';
+        let icon = '?';
+        if(title.includes('Dimasak')) icon = '?';
+        if(title.includes('Diantar')) icon = '?';
+        if(title.includes('Selesai')) icon = '?';
+        if(title.includes('Dibatalkan')) icon = '?';
 
         toast.innerHTML = `
             <div class="toast-icon">` + icon + `</div>
@@ -407,7 +413,7 @@
                 }
 
                 if (filteredData.length === 0) {
-                    container.innerHTML = '<div class="food-card" style="grid-column: 1/-1; text-align:center; padding:40px;"><h3>Yah, kategori ini kosong! 😭</h3></div>';
+                    container.innerHTML = '<div class="food-card" style="grid-column: 1/-1; text-align:center; padding:40px;"><h3>Yah, kategori ini kosong! ?</h3></div>';
                     return;
                 }
 

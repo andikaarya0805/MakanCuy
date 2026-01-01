@@ -1,3 +1,9 @@
+<%-- 
+    Document   : debug
+    Created on : Dec 20, 2025, 4:59:40 PM
+    Author     : andik
+--%>
+
 <%@ page import="java.sql.*" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>

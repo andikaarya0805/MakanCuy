@@ -1,3 +1,9 @@
+<%-- 
+    Document   : history
+    Created on : Dec 20, 2025, 5:29:12 PM
+    Author     : andik
+--%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ page import="com.makancuy.model.User" %>
