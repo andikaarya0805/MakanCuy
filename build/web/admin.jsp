@@ -24,7 +24,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard Pro - MakanCuy</title>
     
-    <script src="https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     
@@ -205,9 +207,9 @@
         </div>
 
         <div id="tab-history" class="tab-section">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center;">
-                <h2 style="margin:0;">Laporan Transaksi</h2>
-                <button onclick="downloadReport()" class="btn" style="background: #fff; color: #000; font-size: 0.8rem;">📄 PDF</button>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="downloadPDF()" class="btn" style="background: #e74c3c; color: #fff; font-size: 0.8rem;">📄 Download PDF</button>
+                <button onclick="downloadExcel()" class="btn" style="background: #27ae60; color: #fff; font-size: 0.8rem;">📊 Download Excel</button>
             </div>
             <div class="card">
                 <div class="table-responsive">
@@ -372,7 +374,6 @@
                                         '<option value="PROCESSING">🔥 Proses Masak</option>' +
                                         '<option value="COMPLETED">✅ Pesanan Selesai</option>' +
                                         '<option value="DELIVERING">🛵 Antar Pesanan</option>' +
- 
                                     '</select>' +
                                 '</div>' +
                             '</div>';
@@ -429,10 +430,68 @@
             } catch (err) { }
         }
 
-        function downloadReport() {
-            const opt = { margin: 0.5, filename: 'Laporan_MakanCuy.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } };
-            html2pdf().set(opt).from(document.getElementById('tab-history')).save();
+        // --- FUNGSI DOWNLOAD PDF (RAPI & BERSIH) ---
+function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF(); // Default A4 Portrait
+
+    // 1. Judul Laporan
+    doc.setFontSize(18);
+    doc.text("Laporan Penjualan MakanCuy", 14, 20);
+    
+    // 2. Info Tanggal & Total
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const totalRev = document.getElementById('total-revenue-text').innerText; // Ambil total dari dashboard
+    
+    doc.text("Tanggal Cetak: " + today, 14, 30);
+    doc.text("Total Pendapatan: " + totalRev, 14, 37);
+
+    // 3. Generate Tabel Otomatis
+    // Kita ambil data langsung dari HTML tabel yang udah ada
+    doc.autoTable({
+        startY: 45,
+        html: '#table-history-body', // ID tbody tabel lu
+        
+        // Custom Header Manual (Karena tabel HTML lu headernya mungkin ada style CSS aneh)
+        head: [['ID Order', 'Tanggal', 'Pelanggan', 'Status', 'Total', 'Aksi']],
+        
+        // Styling Biar Ganteng (Mirip Excel/Invoice)
+        theme: 'grid', // Ada garis kotak-kotak
+        headStyles: { fillColor: [204, 255, 0], textColor: [0, 0, 0], fontStyle: 'bold' }, // Header warna Ijo Neon
+        styles: { fontSize: 9, cellPadding: 3 },
+        alternateRowStyles: { fillColor: [245, 245, 245] }, // Baris selang-seling abu tipis
+        
+        // Bersihin kolom 'Aksi' (Tombol tolak gak usah masuk PDF)
+        didParseCell: function (data) {
+            if (data.column.index === 5) {
+                data.cell.text = ''; // Kosongin kolom aksi
+            }
         }
+    });
+
+    // 4. Footer Total di Bawah Tabel
+    let finalY = doc.lastAutoTable.finalY + 10;
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("GRAND TOTAL: " + totalRev, 14, finalY);
+
+    // 5. Save
+    doc.save('Laporan_MakanCuy_' + Date.now() + '.pdf');
+}
+
+// --- FUNGSI DOWNLOAD EXCEL (DATA MENTAH) ---
+function downloadExcel() {
+    // Ambil data tabel
+    var table = document.querySelector("table"); // Pastikan ini select tabel history
+    
+    // Convert ke Worksheet Excel
+    var wb = XLSX.utils.table_to_book(table, {sheet: "Laporan Penjualan"});
+    
+    // Download File
+    XLSX.writeFile(wb, 'Laporan_MakanCuy.xlsx');
+}
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
