@@ -40,16 +40,6 @@ Project ini dibangun dengan teknologi yang _solid_ dan _lightweight_:
 
 ---
 
-## 📸 Screenshots
-
-| Hero Section | Menu Grid |
-| :---: | :---: |
-| ![Hero](https://via.placeholder.com/400x200?text=Hero+Section) | ![Menu](https://via.placeholder.com/400x200?text=Menu+GenZ) |
-
-| Admin Dashboard | Mobile View |
-| :---: | :---: |
-| ![Admin](https://via.placeholder.com/400x200?text=Admin+Dashboard) | ![Mobile](https://via.placeholder.com/200x400?text=Mobile+View) |
-
 ---
 
 ## ⚙️ Cara Install & Jalankan (Localhost)
