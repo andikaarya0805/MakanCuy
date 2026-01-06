@@ -13,6 +13,19 @@
             <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/Dockerfile</file>
             <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/README.md</file>
             <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/build.xml</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/web/login.jsp</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/web/invoice.jsp</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/web/admin.jsp</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/model/CartItem.java</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/Controller/Cart.java</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/DAO/CartDAO.java</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/DAO/VoucherDAO.java</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/Controller/Chat.java</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/DAO/ChatDAO.java</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/Controller/Admin.java</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/DAO/OrderDAO.java</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/src/java/Controller/Checkout.java</file>
+            <file>file:/D:/dika/tugas/pemrograman2/MakanCuy/web/Checkout.jsp</file>
         </group>
     </open-files>
 </project-private>
