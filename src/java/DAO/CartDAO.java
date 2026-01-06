@@ -46,7 +46,8 @@ public class CartDAO {
     // 1. AMBIL SEMUA ISI KERANJANG USER
     public List<CartItem> getCartItems(int userId) {
         List<CartItem> list = new ArrayList<>();
-        String sql = "SELECT c.id, c.quantity, m.id as menu_id, m.name, m.price, m.image_url, m.category " +
+        // [FIX] Tambahkan c.notes ke query SELECT
+        String sql = "SELECT c.id, c.quantity, c.notes, m.id as menu_id, m.name, m.price, m.image_url, m.category " +
                      "FROM cart c JOIN menu m ON c.menu_id = m.id " +
                      "WHERE c.user_id = ?";
 
@@ -62,7 +63,11 @@ public class CartDAO {
                 menu.setPrice(rs.getDouble("price"));
                 menu.setImageUrl(rs.getString("image_url"));
                 
-                list.add(new CartItem(rs.getInt("id"), menu, rs.getInt("quantity")));
+                CartItem item = new CartItem(rs.getInt("id"), menu, rs.getInt("quantity"));
+                // [FIX] Set notes dari database ke objek CartItem
+                item.setNotes(rs.getString("notes")); 
+                
+                list.add(item);
             }
         } catch (Exception e) { e.printStackTrace(); }
         return list;
@@ -76,6 +81,7 @@ public class CartDAO {
             ps.executeUpdate();
         } catch (Exception e) { e.printStackTrace(); }
     }
+
     // FUNGSI UPDATE QUANTITY (+1 atau -1)
     public void updateQuantity(int userId, int menuId, int change) {
         String sqlCheck = "SELECT quantity FROM cart WHERE user_id = ? AND menu_id = ?";
@@ -108,6 +114,20 @@ public class CartDAO {
                     psUp.executeUpdate();
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // FUNGSI UPDATE CATATAN
+    public void updateNote(int userId, int menuId, String notes) {
+        try (Connection conn = DBConnection.getConnection()) { 
+            String sql = "UPDATE cart SET notes = ? WHERE user_id = ? AND menu_id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, notes);
+            ps.setInt(2, userId);
+            ps.setInt(3, menuId);
+            ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         }

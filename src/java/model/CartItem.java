@@ -4,6 +4,7 @@ public class CartItem {
     private int id; // ID Cart
     private MenuItem menu; // Objek Menu (biar bisa ambil nama/gambar)
     private int quantity;
+    private String notes = "";
 
     public CartItem(int id, MenuItem menu, int quantity) {
         this.id = id;
@@ -15,4 +16,11 @@ public class CartItem {
     public int getId() { return id; }
     public MenuItem getMenu() { return menu; }
     public int getQuantity() { return quantity; }
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
 }

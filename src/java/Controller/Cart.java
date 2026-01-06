@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.makancuy.dao.CartDAO;
 import com.makancuy.model.CartItem;
 import com.makancuy.model.User;
+import com.makancuy.dao.VoucherDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -29,13 +30,12 @@ public class Cart extends HttpServlet {
         // --- 1. CEK LOGIN (SATPAM) ---
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
-            // Kalau request AJAX minta JSON
             if ("json".equals(req.getParameter("mode"))) {
                 resp.sendError(401, "Need Login");
             } else {
                 resp.sendRedirect("login.jsp?error=need_login");
             }
-            return; // <--- WAJIB RETURN BIAR GAK LANJUT KE BAWAH
+            return;
         }
 
         User user = (User) session.getAttribute("user");
@@ -46,13 +46,11 @@ public class Cart extends HttpServlet {
         if ("view".equals(action)) {
             List<CartItem> items = cartDAO.getCartItems(userId);
             
-            // Hitung Total
             double grandTotal = 0;
             for (CartItem item : items) {
                 grandTotal += (item.getMenu().getPrice() * item.getQuantity());
             }
 
-            // Kirim JSON
             Gson gson = new Gson();
             String jsonItems = gson.toJson(items);
             String jsonResponse = "{\"items\": " + jsonItems + ", \"total\": " + grandTotal + "}";
@@ -60,7 +58,7 @@ public class Cart extends HttpServlet {
             resp.setContentType("application/json");
             resp.setCharacterEncoding("UTF-8");
             resp.getWriter().write(jsonResponse);
-            return; // <--- STOP DI SINI
+            return;
         }
 
         // --- 3. FITUR UPDATE QUANTITY (+ / -) ---
@@ -76,7 +74,7 @@ public class Cart extends HttpServlet {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return; // <--- STOP DI SINI
+            return;
         }
 
         // --- 4. FITUR TAMBAH KERANJANG (ADD) ---
@@ -84,14 +82,41 @@ public class Cart extends HttpServlet {
             try {
                 int menuId = Integer.parseInt(req.getParameter("id"));
                 cartDAO.addToCart(userId, menuId);
-                
-                // Redirect ke ./ (Root) bukan index.jsp biar URL bersih
                 resp.sendRedirect("./?status=added");
             } catch (Exception e) {
                 e.printStackTrace();
                 resp.sendRedirect("./?status=error");
             }
-            return; // <--- INI YG BIKIN ERROR 500 KALAU LUPA DITULIS
+            return;
+        }
+        
+        // --- 5. FITUR UPDATE CATATAN (FIXED: PAKE DAO) ---
+        else if ("update_note".equals(action)) {
+            try {
+                int menuId = Integer.parseInt(req.getParameter("id"));
+                String notes = req.getParameter("notes");
+                
+                // Panggil DAO buat simpan ke database
+                cartDAO.updateNote(userId, menuId, notes);
+                
+                resp.getWriter().write("OK");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+        
+        // --- 6. FITUR CEK VOUCHER (TARUH DI BAGIAN PALING BAWAH doGet) ---
+        else if ("check_voucher".equals(action)) {
+            String code = req.getParameter("code");
+            
+            VoucherDAO voucherDAO = new VoucherDAO();
+            int discount = voucherDAO.checkVoucher(code);
+            
+            // Kirim balikan ke JS: {"discount": 20} atau {"discount": 0}
+            resp.setContentType("application/json");
+            resp.getWriter().write("{\"discount\": " + discount + "}");
+            return;
         }
     }
 }

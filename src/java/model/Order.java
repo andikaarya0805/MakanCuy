@@ -8,38 +8,46 @@ public class Order {
     private double total;
     private String method;
     private Timestamp date;
-    
-    // 1. TAMBAH VARIABLE INI
     private String status; 
+    
+    // --- TAMBAHAN BARU ---
+    private String notes; 
 
-    // Constructor Kosong (Wajib ada biar fleksibel)
+    // Constructor Kosong
     public Order() {}
 
-    // Constructor Lengkap (Update tambah status)
-    public Order(int id, String username, double total, String method, Timestamp date, String status) {
+    // Constructor Lengkap
+    public Order(int id, String username, double total, String method, Timestamp date, String status, String notes) {
         this.id = id;
         this.username = username;
         this.total = total;
         this.method = method;
         this.date = date;
-        this.status = status; // <--- Assign di sini
+        this.status = status;
+        this.notes = notes;
     }
 
-    // Getter Lama
+    // --- GETTER & SETTER ---
+    
     public int getId() { return id; }
-    public String getUsername() { return username; }
-    public double getTotal() { return total; }
-    public String getMethod() { return method; }
-    public Timestamp getDate() { return date; }
+    public void setId(int id) { this.id = id; }
 
-    // 2. TAMBAH GETTER & SETTER STATUS (PENTING!)
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+
+    public double getTotal() { return total; }
+    public void setTotal(double total) { this.total = total; }
+
+    public String getMethod() { return method; }
+    public void setMethod(String method) { this.method = method; }
+
+    public Timestamp getDate() { return date; }
+    public void setDate(Timestamp date) { this.date = date; }
+
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    // 3. Tambah Setter lain (Biar DAO kamu gak error kalau pake setter manual)
-    public void setId(int id) { this.id = id; }
-    public void setUsername(String username) { this.username = username; }
-    public void setTotal(double total) { this.total = total; }
-    public void setMethod(String method) { this.method = method; }
-    public void setDate(Timestamp date) { this.date = date; }
+    // --- GETTER SETTER NOTES (PENTING) ---
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
 }
