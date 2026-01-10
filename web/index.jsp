@@ -381,7 +381,7 @@
             });
         });
     }
-    setInterval(loadUserMessages, 1000);
+    setInterval(loadUserMessages, 3000);
     loadUserMessages();
 
     // --- GACHA & MENU ---
@@ -423,7 +423,7 @@
                 localStorage.setItem('lastStatus', lastStatus); localStorage.setItem('lastOrderId', lastOrderId);
             }
         }).catch(e=>{});
-    }, 1000);
+    }, 3000);
 </script>
 </body>
 </html>
